@@ -1,0 +1,613 @@
+openapi: 3.0.1
+info:
+  title: Datak
+  version: 1.0.0
+servers:
+- url: localhost/api/v1
+- url: localhost/api/v1
+tags:
+- name: user
+  description: Operations about user
+- name: event
+  description: Users Event
+- name: eventInvitation
+  description: Event Invitation
+paths:
+
+  /register:
+    post:
+      tags:
+      - user
+      summary: register user
+      description: .
+      operationId: RegisterUser
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: name of applicant
+                email:
+                  type: string
+                  description: email of applicant and should be unique
+                mobile:
+                  type: string
+                  description: mobile of applicant and should be unique
+                password:
+                  type: string
+                image:
+                  type: string
+                  format: binary
+                  description: image for profile
+                
+              required:
+                - name
+                - email
+                - mobile
+                - password
+      responses:
+        200:
+          description: successful operation
+          content: 
+            application/json:
+              schema:
+                  required: 
+                    - "message"
+                    - "token"
+                    - "type"
+                    - "expires"
+                  properties: 
+                    message: 
+                      type: "string"
+                    token: 
+                      type: "string"
+                    type: 
+                      type: "string"
+                    expires: 
+                      type: "string"
+
+        422:
+          description: validation error
+          content: 
+            application/json:
+              schema:
+                  required: 
+                    - "name"
+                    - "email"
+                    - "mobile"
+                    - "password"
+                  properties: 
+                    name: 
+                      type: "string" 
+                    email: 
+                      type: "string" 
+                    mobile: 
+                      type: "string" 
+                    password: 
+                      type: "string"
+  /login:
+    post:
+      tags:
+      - user
+      summary: Login user
+      description: .
+      operationId: LoginUser
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  description: mobile or email  of user
+                password:
+                  type: string
+                
+              required:
+                - username
+                - password
+      responses:
+        200:
+          description: successful operation
+          content: 
+            application/json:
+              schema:
+                  required: 
+                    - "token"
+                    - "type"
+                    - "expires"
+                  properties: 
+                    token: 
+                      type: "string"
+                    type: 
+                      type: "string"
+                    expires: 
+                      type: "string"
+
+        422:
+          description: validation error
+          content: 
+            application/json:
+              schema:
+                  required: 
+                    - "username"
+                    - "password"
+                  properties: 
+                    username: 
+                      type: "string" 
+                    password: 
+                      type: "string"
+  /pofile:
+    get:
+      security:
+        - bearerAuth : []
+      tags:
+      - user
+      summary: logged in user info
+      description: This can only be done by the logged in user.
+      operationId: getUser
+      responses:
+        200:
+          description: successful operation
+          content: 
+            application/json:
+              schema:
+                required: 
+                  - "status"
+                  - "data"
+                properties: 
+                  result: 
+                    type: "string"
+                  data: 
+                    required: 
+                      - "name"
+                      - "email"
+                      - "mobile"
+                      - "image"
+                    properties: 
+                      name: 
+                        type: "string"
+                      email: 
+                        type: "string"
+                      mobile: 
+                        type: "string"
+                      image: 
+                        type: "string"
+                    type: "object"
+        401:
+          description: unuthorized
+          content: 
+            application/json:
+              schema:
+                  required: 
+                    - "error"
+                  properties: 
+                    error: 
+                      type: "string"
+  /update-profile:
+    post:
+      security:
+        - bearerAuth : []
+      tags:
+      - user
+      summary: edit profile user
+      description: .
+      operationId: UpdateProfile
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: name of applicant
+                image:
+                  type: string
+                  format: binary
+                  description: image for profile
+                
+      responses:
+        200:
+          description: successful operation
+          content: 
+            application/json:
+              schema:
+                  required: 
+                    - "message"
+                  properties: 
+                    message: 
+                      type: "string"
+
+        422:
+          description: validation error
+          content: 
+            application/json:
+              schema:
+                  required: 
+                    - "name"
+                    - "image"
+                  properties: 
+                    name: 
+                      type: "string" 
+                    image: 
+                      type: "string" 
+  
+  
+  /event:
+    get:
+      security:
+        - bearerAuth : []
+      tags:
+      - event
+      summary: users event list
+      description: .
+      operationId: UserEvent
+                
+      responses:
+        200:
+          description: successful operation
+          content: 
+            application/json:
+              schema:
+                  required: 
+                    - "message"
+                    - "data"
+                  properties: 
+                    result: 
+                      type: "string"
+                    data: 
+                      type: "array"
+                      items: 
+                        type: "object"
+                        properties: 
+                          id: 
+                            type: "number"
+                          name: 
+                            type: "string"
+                          onwer_id: 
+                            type: "number"
+                          due_date: 
+                            type: "string"
+                          created_at: 
+                            type: "string"
+                          updated_at: 
+                            type: "string"
+  
+
+        401:
+          description: unathorized
+  /event/:
+    post:
+      security:
+        - bearerAuth : []
+      tags:
+      - event
+      summary: Store new Event
+      description: .
+      operationId: StoreEvent
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: name of event
+                due_date:
+                  type: string
+                  description: timeStamp of event due date
+                  format: Y-m-d H:i
+                username:
+                  type: array
+                  items:
+                    type: string
+                  description: list of username (email or mobile number) are invited
+                
+              required:
+                - name
+                - due_date
+                - username
+      responses:
+        200:
+          description: successful operation
+          content: 
+            application/json:
+              schema:
+                  required: 
+                    - "message"
+                    - "data"
+                  properties: 
+                    result: 
+                      type: "string"
+                    data: 
+                      items: 
+                        type: "object"
+                        properties: 
+                          id: 
+                            type: "number"
+                          name: 
+                            type: "string"
+                          onwer_id: 
+                            type: "number"
+                          due_date: 
+                            type: "string"
+                          created_at: 
+                            type: "string"
+                          updated_at: 
+                            type: "string"
+  
+
+        401:
+          description: unathorized
+  /event/{id}/:
+    get:
+      security:
+        - bearerAuth : []
+      tags:
+      - event
+      summary: event info + Invited Users (guests)
+      description: .
+      operationId: EventInfo
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "ID of event"
+        required: true
+        schema:
+          type: "integer"
+          format: "int10"          
+      responses:
+        200:
+          description: successful operation
+          content: 
+            application/json:
+              schema:
+                  required: 
+                    - "message"
+                    - "data"
+                  properties: 
+                    result: 
+                      type: "string"
+                    data: 
+                      type: "object"
+                      properties: 
+                        id: 
+                          type: "number"
+                        name: 
+                          type: "string"
+                        onwer_id: 
+                          type: "number"
+                        due_date: 
+                          type: "string"
+                        created_at: 
+                          type: "string"
+                        updated_at: 
+                          type: "string"
+                        guests: 
+                          type: "array"
+                          items:
+                            type: 'object'
+                            properties: 
+                              id: 
+                                type: "number"
+                              name: 
+                                type: "string"
+                              image: 
+                                type: "string"
+                              status: 
+                                type: "string"
+  
+
+        401:
+          description: unathorized
+
+        404:
+          description: notFound
+          
+  /event/invitaion:
+    get:
+      security:
+        - bearerAuth : []
+      tags:
+      - eventInvitation
+      summary: users invitaion list to events
+      description: .
+      operationId: UserEventInvitation
+                
+      responses:
+        200:
+          description: successful operation
+          content: 
+            application/json:
+              schema:
+                  required: 
+                    - "message"
+                    - "data"
+                  properties: 
+                    result: 
+                      type: "string"
+                    data: 
+                      type: "array"
+                      items: 
+                        type: "object"
+                        properties: 
+                          id: 
+                            type: "number"
+                          user_id: 
+                            type: "number"
+                          event_id: 
+                            type: "number"
+                          status: 
+                            type: "string"
+                          created_at: 
+                            type: "string"
+                          updated_at: 
+                            type: "string"
+                          event:
+                            type: "array"
+                            items: 
+                              type: "object"
+                              properties: 
+                                id: 
+                                  type: "number"
+                                name: 
+                                  type: "string"
+                                onwer_id: 
+                                  type: "number"
+                                due_date: 
+                                  type: "string"
+                                created_at: 
+                                  type: "string"
+                                updated_at: 
+                                  type: "string"
+  
+
+        401:
+          description: unathorized
+  /event/invitaion/{id}/accept/:
+    post:
+      security:
+        - bearerAuth : []
+      tags:
+      - eventInvitation
+      summary: accept the event Invitation
+      description: .
+      operationId: acceptInvitation
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "ID of event Invitation"
+        required: true
+        schema:
+          type: "integer"
+          format: "int10"
+      responses:
+        200:
+          description: successful operation
+          content: 
+            application/json:
+              schema:
+                  required: 
+                    - "message"
+                    - "data"
+                  properties: 
+                    message: 
+                      type: "string"
+  
+
+        401:
+          description: unathorized
+        404:
+          description: not found
+  /event/invitaion/{id}/decline:
+    post:
+      security:
+        - bearerAuth : []
+      tags:
+      - eventInvitation
+      summary: decline the event Invitation
+      description: .
+      operationId: declineEventInvitation
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "ID of event Invitation"
+        required: true
+        schema:
+          type: "integer"
+          format: "int10"
+      responses:
+        200:
+          description: successful operation
+          content: 
+            application/json:
+              schema:
+                  required: 
+                    - "message"
+                    - "data"
+                  properties: 
+                    message: 
+                      type: "string"
+  
+
+        401:
+          description: unathorized
+        404:
+          description: not found
+          
+components:
+  schemas:
+    users:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        image:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+        mobile:
+          type: string
+        verified_at:
+          type: string
+          format: timestamp
+        remember_token:
+          type: string
+        created_at:
+          type: string
+          format: timestamp
+        updated_at:
+          type: string
+          format: timestamp
+    events:
+      type: object
+      properties:
+        id:
+          type: integer
+        owner_id:
+          type: integer
+        name:
+          type: string
+        due_date:
+          type: string
+          format: timestamp
+        updated_at:
+          type: string
+          format: timestamp
+        created_at:
+          type: string
+          format: timestamp
+    user_events:
+      type: object
+      properties:
+        id:
+          type: integer
+        user_id:
+          type: integer
+        event_id:
+          type: integer
+        status:
+          type: integer
+        updated_at:
+          type: string
+          format: timestamp
+        created_at:
+          type: string
+          format: timestamp
+  securitySchemes:
+      bearerAuth:
+        type: http
+        scheme: bearer
+        bearerFormat: JWT
+  
+  
